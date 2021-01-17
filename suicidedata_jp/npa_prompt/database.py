@@ -38,7 +38,7 @@ def _create_derived_tables_AB5to8(dbfile):
 def create_derived_tables(dbfile):
   _create_derived_tables_AB5to8(dbfile)
 
-def create_sqlite_database(dbfile, csvdir):
+def insert_csvs_to_sqlite(dbfile, csvdir):
   os.makedirs(os.path.dirname(dbfile), exist_ok=True)
   if os.path.isfile(dbfile):
     os.remove(dbfile)
@@ -59,10 +59,10 @@ def create_sqlite_database(dbfile, csvdir):
       logger.info("Inserted CSV file '%s' -> table '%s'", c, tablename)
     logger.info("Finish creating table '%s'", tablename)
   
-  logger.info("Start creating derived tables")
-  _create_derived_tables(dbfile)
-  logger.info("Finish creating derived tables")
-
 def create_sqlite_database(dbfile, csvdir):
+  logger.info("Start inserting csv files to '%s'", dbfile)
   insert_csvs_to_sqlite(dbfile, csvdir)
+  logger.info("End inserting csv files to '%s'", dbfile)
+  logger.info("Start creating derived tables in '%s'", dbfile)
   create_derived_tables(dbfile)
+  logger.info("End creating derived tables in '%s'", dbfile)
