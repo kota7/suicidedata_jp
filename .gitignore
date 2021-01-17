@@ -1,7 +1,10 @@
 .DS_Store
-raw
-tmp
-/dev.ipynb
+/raw
+/parsed
+/db
+*.db
+/tmp
+/dev*.ipynb
 
 
 # Byte-compiled / optimized / DLL files
