@@ -24,7 +24,8 @@ def _create_derived_tables_AB5to8(dbfile):
   tables = ["".join(a) for a in itertools.product("AB", "5678")]
   tabulations = ["age", "housemate", "occupation", "place", "means",
                  "hour", "dayofweek", "reason", "pastattempt"]
-  for table, tabulation in itertools.product(tables, tabulations):
+  for table, tabulation in tqdm(itertools.product(tables, tabulations),
+                                total=len(tables) * len(tabulations)):
     common_cols = _get_common_cols(table)
     q1 = drop_table_template.format(table=table, tabulation=tabulation)
     q2 = craete_query_template.format(table=table, tabulation=tabulation, common_cols=common_cols)

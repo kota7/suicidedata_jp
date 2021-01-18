@@ -31,4 +31,4 @@ def create_sqlite_database(dbfile, csvdir, tablename="prompt"):
   logger.info("Start creating table '%s' in '%s'", tablename, dbfile)
   insert_csvs_to_sqlite(dbfile, csvdir, tablename=tablename)
   logger.info("End creating table '%s' in '%s'", tablename, dbfile)
-  
+

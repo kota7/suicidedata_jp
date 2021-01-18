@@ -2,9 +2,11 @@
 /raw
 /parsed
 /db
+/exported
 *.db
 /tmp
 /dev*.ipynb
+/test*.ipynb
 
 
 # Byte-compiled / optimized / DLL files
