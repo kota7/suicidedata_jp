@@ -106,22 +106,23 @@ def get_file_urls(month_from=(1000, 1), month_to=(9999, 12)):
 def _filename(year, month, extension):
   return "%04d-%02d%s" % (year, month, extension)
 
-def _file_extension(url):
-  if url.find("fileKind=1") >= 0:
-    return ".csv"
-  elif url.find("fileKind=4") >= 0:
-    return ".xlsx"
-  elif url.find("fileKind=0") >= 0:
-    return ".xls"
-  else:
-    logger.error("File type could not be inferred: '%s'", url)
-    raise ValueError("File type could not be inferred: '{}'".format(url))
+# def _file_extension(url):
+#   if url.find("fileKind=1") >= 0:
+#     return ".csv"
+#   elif url.find("fileKind=4") >= 0:
+#     return ".xlsx"
+#   elif url.find("fileKind=0") >= 0:
+#     return ".xls"
+#   else:
+#     logger.error("File type could not be inferred: '%s'", url)
+#     raise ValueError("File type could not be inferred: '{}'".format(url))
 
 def download_spreadsheets(savedir, month_from=(1000, 1), month_to=(9999, 12), replace=False):
   urls = get_file_urls(month_from=month_from, month_to=month_to)
   downloaded = []
   for (year, month), url in tqdm(urls.items()):
-    extension = _file_extension(url)
+    #extension = _file_extension(url)
+    extension = ".xls"  # extension inferrence from url is not complete, simply save all as .xls
     savepath = os.path.join(savedir, _filename(year, month, extension))
     if (not replace) and os.path.isfile(savepath):
       logger.debug("'%s' already exists, skipped", savepath)
