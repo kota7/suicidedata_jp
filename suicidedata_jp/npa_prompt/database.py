@@ -17,7 +17,7 @@ def _create_derived_tables_AB5to8(dbfile):
     FROM {table} WHERE tabulation = '{tabulation}'
   """
   def _get_common_cols(table):
-    out = ["geocode", "geoname", "geoname2", 
+    out = ["time", "geocode", "geoname", "geoname2", 
            "timedef", "locdef", "sex"]
     return ", ".join(out)
 

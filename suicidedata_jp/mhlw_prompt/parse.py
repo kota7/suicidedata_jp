@@ -170,11 +170,13 @@ def parse_to_df(srcpath):
   out = []
   header = ["time", "geocode", "geoname", "sex", "cause"] + ages
   geo, cause = None, None
+  georegex = r"\d*(北海道|青森|岩手|宮城|秋田|山形|福島|茨城|栃木|群馬|埼玉|千葉|東京|神奈川|新潟|富山|石川|福井|山梨|長野|岐阜|静岡|愛知|三重|滋賀|京都|大阪|兵庫|奈良|和歌山|鳥取|島根|岡山|広島|山口|徳島|香川|愛媛|高知|福岡|佐賀|長崎|熊本|大分|宮崎|鹿児島|沖縄|外国|不詳|東京都区部|札幌市|仙台市|さいたま市|千葉市|横浜市|川崎市|相模原市|新潟市|静岡市|浜松市|名古屋市|京都市|大阪市|堺市|神戸市|岡山市|広島市|北九州市|福岡市|熊本市)"
+  georegex = re.compile(georegex)
   for i in range(agerow+1, len(x)):
     sex = x[i, sexcol].strip()
     # update geo
     tmp = re.sub(r"\s", "", x[i, geocol])
-    if tmp != "" and sex == "":
+    if georegex.match(tmp):
       geo = tmp
       geocode, geoname = _split_geocode(geo)
       geoname = _normalize_geoname(geoname)
