@@ -2,6 +2,7 @@
 
 from logging import getLogger
 import itertools
+import csv
 import os
 import numpy as np
 import pandas as pd
@@ -11,37 +12,49 @@ from tqdm import tqdm
 logger = getLogger(__name__)
 
 
+def _read_as_xls(srcpath):
+  with open(srcpath, "rb") as f:
+    x = pd.read_excel(f, engine="xlrd", header=None)
+    logger.debug("'%s' could be read as .xls file", srcpath)
+    return x
+
+def _read_as_xlsx(srcpath):
+  with open(srcpath, "rb") as f:
+    x = pd.read_excel(f, engine="openpyxl", header=None)
+    logger.debug("'%s' could be read as .xlsx file", srcpath)
+    return x
+
+def _read_as_csv(srcpath):
+  with open(srcpath, "r", encoding="cp932") as f:
+    # file may contain varying number of columns so we first count the max col count
+    rdr = csv.reader(f)
+    colcount = 0
+    for row in rdr:
+      colcount = max(colcount, len(row))
+    logger.debug("'%s' contain maximum %d columns", srcpath, colcount)
+
+  with open(srcpath, "rb") as f:
+    x = pd.read_csv(f, encoding="cp932", header=None, names=range(colcount))
+    logger.debug("'%s' is read as .csv file", srcpath)
+    return x
+
 def _read_file(srcpath):
   # read either xls, xlsx or csv file
   # return numpy array
-  with open(srcpath, "rb") as f:
-    try:
-      x = pd.read_excel(f, engine="xlrd", header=None)
-      logger.debug("'%s' is read as .xls file", srcpath)
-      return x
-    except Exception as e:
-      logger.info("'%s' could not be read as .xls file: '%s'", srcpath, e)
   
-  with open(srcpath, "rb") as f:
+  readers = (_read_as_xls, _read_as_xlsx, _read_as_csv)
+  errors = []
+  for reader in readers:
     try:
-      x = pd.read_excel(f, engine="openpyxl", header=None)
-      logger.debug("'%s' is read as .xlsx file", srcpath)
-      return x
+      x = reader(srcpath)
+      return x.fillna("").values.astype(str)
     except Exception as e:
-      logger.info("'%s' could not be read as .xlsx file: '%s'", srcpath, e)
-
-  with open(srcpath, "rb") as f:
-    try:
-      x = pd.read_csv(f, encoding="cp932", header=None)
-      logger.debug("'%s' is read as .csv file", srcpath)
-      return x
-    except Exception as e:
-      logger.info("'%s' could not be read as .csv file: '%s'", srcpath, e)
-  raise ValueError("Failed to read '%s' (not .xls, .xlsx nor .csv?)", srcpath)
+      logger.info("Failed to read with '%s': %s", reader, e)
+      errors.append(str(e))
+  raise ValueError("Failed to read '{}' (not .xls, .xlsx nor .csv?): {}".format(srcpath, ";".join(errors)))
 
 def parse_to_df(srcpath):
   x = _read_file(srcpath)
-  x = x.fillna("").values.astype(str)
   def _find_year_month():
     for i, j  in itertools.product(range(5), range(5)):
       cell = x[i,j].strip()
